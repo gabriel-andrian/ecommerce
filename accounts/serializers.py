@@ -6,4 +6,4 @@ class UserSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True, max_length=20)
     email = serializers.CharField(max_length=255)
     is_staff = serializers.BooleanField(default=False)
-    is_superuser = serializers.BooleanField(default=False)
+    is_superuser = serializers.BooleanField(default=False)    

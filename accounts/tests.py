@@ -1,3 +1,5 @@
 from django.test import TestCase
 
-# Create your tests here.
+class TestTdd(TestCase):
+    def test_test():
+        assert 2 == 1
