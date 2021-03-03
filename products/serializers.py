@@ -2,6 +2,12 @@ from rest_framework import serializers
 from .utils import TRANSACTION_CHOICES
 
 
+class CategoriesSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField()
+    description = serializers.CharField()
+
+
 class ProductSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField()
@@ -9,6 +15,7 @@ class ProductSerializer(serializers.Serializer):
     price = serializers.FloatField()
     created = serializers.DateField(read_only=True)
     modified = serializers.DateField(read_only=True)
+    categories = CategoriesSerializer(many=True)
 
 
 class StockSerializer(serializers.Serializer):
