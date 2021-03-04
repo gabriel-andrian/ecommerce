@@ -5,12 +5,27 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Stock, Product, Transaction, Category
-from .serializers import StockSerializer, ProductSerializer, TransactionSerializer
+from .serializers import StockSerializer, ProductSerializer, TransactionSerializer, CategoriesSerializer
 # Create your views here.
 import ipdb
 
 
 class ProductView(APIView):
+
+    def get(self, request, slug=None):
+
+        if not slug:
+            query_products = Product.objects.all()
+
+            serializer = ProductSerializer(query_products, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        product = get_object_or_404(Product, slug=slug.lower())
+
+        serializer = ProductSerializer(product)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
@@ -37,8 +52,29 @@ class ProductView(APIView):
         serializer = ProductSerializer(product)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def put(self, request, product_id):
-        query = get_object_or_404(Product, id=product_id)
+    # Delete apagando tabela Transaction (não pode)
+    # def delete(self, request, slug):
+
+    #     product = Product.objects.get(id=1)
+    #     product.delete()
+    #     return Response(data="ok", status=status.HTTP_200_OK)
+
+
+class CategoriesView(APIView):
+    def get(self, request, slug=None):
+
+        if not slug:
+            categories = Category.objects.all()
+            serializer = CategoriesSerializer(categories, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        category = get_object_or_404(Category, slug=slug.lower())
+        products = Product.objects.all().filter(categories=category.id)
+
+        serializer = ProductSerializer(products, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class TransactionView(APIView):
@@ -71,3 +107,10 @@ class TransactionView(APIView):
             product.product_stock.amount += request.data['amount']
             product.product_stock.save()
             return Response(data={'msg': 'Adicionado com sucesso'})
+
+
+class TesteView(APIView):
+    def get(self, request, slug):
+        category_slug = slug
+        ipdb.set_trace()
+        return Response(data={'msg': category_slug}, status=status.HTTP_200_OK)

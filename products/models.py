@@ -21,6 +21,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
+    slug = models.SlugField(default="")
     description = models.TextField()
     price = models.DecimalField(decimal_places=2, max_digits=10)
     created = models.DateField(auto_now_add=True)
@@ -28,6 +29,11 @@ class Product(models.Model):
 
     categories = models.ManyToManyField(
         'Category', related_name='product_categories', blank=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -38,7 +44,7 @@ class Stock(models.Model):
     amount = models.PositiveIntegerField(default=0)
 
     product = models.OneToOneField(
-        Product, on_delete=models.CASCADE, related_name='product_stock')
+        Product, related_name='product_stock', on_delete=models.CASCADE)
 
     def is_avaliable():
         if (amount > 0):
@@ -55,7 +61,7 @@ class Transaction(models.Model):
     created = models.DateField(auto_now_add=True)
     amount = models.PositiveIntegerField(null=False)
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name='product_transactions')
+        Product, related_name='product_transactions', on_delete=models.CASCADE)
     transaction_type = models.IntegerField(
         choices=TRANSACTION_CHOICES, blank=False, null=False)
 

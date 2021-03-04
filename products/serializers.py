@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .utils import TRANSACTION_CHOICES
 
 
-class CategoriesSerializer(serializers.HyperlinkedModelSerializer):
+class CategoriesSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField()
     description = serializers.CharField()
