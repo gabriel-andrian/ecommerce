@@ -4,13 +4,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import Stock, Product, Transaction
+from .models import Stock, Product, Transaction, Category
 from .serializers import StockSerializer, ProductSerializer, TransactionSerializer
 # Create your views here.
 import ipdb
 
 
 class ProductView(APIView):
+
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
 
@@ -18,11 +19,26 @@ class ProductView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         # Se o nome for igual esta retornando error 500, trocar.
-        product = Product.objects.create(**request.data)
+        product, created = Product.objects.get_or_create(
+            name=request.data['name'],
+            description=request.data['description'],
+            price=request.data['price']
+        )
+
+        if not created:
+            return Response({'message': f'Product {product.name} already exists'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
         stock = Stock.objects.create(product=product)
+
+        for category in request.data['categories']:
+            category = Category.objects.get_or_create(**category)[0]
+            product.categories.add(category)
 
         serializer = ProductSerializer(product)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def put(self, request, product_id):
+        query = get_object_or_404(Product, id=product_id)
 
 
 class TransactionView(APIView):
