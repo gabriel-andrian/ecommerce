@@ -110,6 +110,7 @@ media/
 
 # VSCode
 .vscode/
+db.ecommerce
 
 # Ignore Django Migrations in Development if you are working on team
 
