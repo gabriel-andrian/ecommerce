@@ -18,8 +18,17 @@ band.tags.add(tag)
 
 Se já existe a categoria ele só vai pegar, se não vai criar. e add todas as categorias para o Product.
 
-- ORDER STATUS:
-  fazer atualizar só o campo STATUS com as opções, se for o status CANCELADO precisa ter + 1 campo de mensagem, se não tiver retornar erro do campo faltando, os outros status podem ter mensagem == empty
+# ORDER STATUS:
+
+fazer atualizar só o campo STATUS com as opções, se for o status CANCELADO precisa ter + 1 campo de mensagem, se não tiver retornar erro do campo faltando, os outros status podem ter mensagem == empty
+
+# Product
+
+Não deletar o item... Usar um state avaliable / not para saber se o item 'existe' ou não.
+
+# Cart - Item
+
+Quando for deletar ou encerrar o carrinho, fazer um loop pelos itens e deletar 1 por 1 (item) e no fim, deletar o carrinho.
 
 Cart 1x1 usuario, quando o usuario fecha a compra abre uma ORDER e deleta o carrinho (Com isso vc
 tem o carrinho salvo no banco de dados, mas quando o pedido é finalizado ou deletado o carrinho apaga os itens dentro.)

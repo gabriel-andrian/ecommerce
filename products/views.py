@@ -14,15 +14,22 @@ class ProductView(APIView):
 
     def get(self, request, slug=None):
 
+        if slug.lower() == 'avaliables':
+            products = Product.objects.all()
+            avaliables = []
+
+            for product in products:
+                if product.is_avaliable():
+                    avaliables.append(product)
+
+            serializer = ProductSerializer(avaliables, many=True)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+
         if not slug:
-            query_products = Product.objects.all()
 
-            serializer = ProductSerializer(query_products, many=True)
-
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         product = get_object_or_404(Product, slug=slug.lower())
-
         serializer = ProductSerializer(product)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -66,6 +73,13 @@ class CategoriesView(APIView):
         if not slug:
             categories = Category.objects.all()
             serializer = CategoriesSerializer(categories, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        if slug.lower() == 'products':
+            query_products = Product.objects.all()
+
+            serializer = ProductSerializer(query_products, many=True)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
 

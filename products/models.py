@@ -1,4 +1,5 @@
 from django.db import models
+from django.shortcuts import get_object_or_404
 from django.utils.text import slugify
 from .utils import TRANSACTION_CHOICES
 
@@ -35,6 +36,11 @@ class Product(models.Model):
 
         super().save(*args, **kwargs)
 
+    def is_avaliable(self):
+        if get_object_or_404(Stock, id=self.id).amount == 0:
+            return False
+        return True
+
     def __str__(self):
         return self.name
 
@@ -46,11 +52,12 @@ class Stock(models.Model):
     product = models.OneToOneField(
         Product, related_name='product_stock', on_delete=models.CASCADE)
 
-    def is_avaliable():
-        if (amount > 0):
-            return True
-
-        return False
+    def save(self, *args, **kwargs):
+        if self.amount == 0:
+            self.avaliable = False
+        else:
+            self.avaliable = True
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.id
