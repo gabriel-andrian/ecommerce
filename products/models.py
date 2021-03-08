@@ -45,6 +45,7 @@ class Product(models.Model):
         return self.name
 
 
+
 class Stock(models.Model):
     avaliable = models.BooleanField(default=False)
     amount = models.PositiveIntegerField(default=0)

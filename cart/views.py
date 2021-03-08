@@ -22,7 +22,7 @@ import ipdb
 class CartView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsCustomer]
-    queryset = Product.objects.last()
+    queryset = Cart.objects.last()
     def get(self, request):
         cart = get_object_or_404(Cart, user=request.data['user'])
 
@@ -33,7 +33,7 @@ class CartView(APIView):
 class CartItemView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsCustomer]
-    queryset = Product.objects.last()
+    queryset = Cart.objects.last()
     def post(self, request, slug):
         quantity = ItemQuantitySerializer(data=request.data)
 
