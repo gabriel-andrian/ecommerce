@@ -6,14 +6,15 @@ from rest_framework import status
 
 from .models import Stock, Product, Transaction, Category
 from .serializers import StockSerializer, ProductSerializer, TransactionSerializer, CategoriesSerializer
+
+from rest_framework.authentication import TokenAuthentication
+from accounts.permissions import IsSeller, IsCustomer
 # Create your views here.
 import ipdb
 
 
 class ProductView(APIView):
-
     def get(self, request, slug=None):
-
         if slug.lower() == 'avaliables':
             products = Product.objects.all()
             avaliables = []
@@ -35,6 +36,10 @@ class ProductView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
+        authentication_classes = [TokenAuthentication]
+        permission_classes = [IsSeller]
+        queryset = Product.objects.last()
+
         serializer = ProductSerializer(data=request.data)
 
         if not serializer.is_valid():
@@ -93,6 +98,10 @@ class CategoriesView(APIView):
 
 class TransactionView(APIView):
     def post(self, request):
+        authentication_classes = [TokenAuthentication]
+        permission_classes = [IsSeller | IsCustomer]
+        queryset = Transaction.objects.last()
+        
         serializer = TransactionSerializer(data=request.data)
 
         if not serializer.is_valid():

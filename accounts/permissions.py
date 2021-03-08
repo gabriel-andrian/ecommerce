@@ -10,7 +10,7 @@ class IsSeller(BasePermission):
         if  request.user.is_staff == True and request.user.is_superuser == False:
             return True
 
-class IsCostumer(BasePermission):
+class IsCustomer(BasePermission):
     def has_permission(self, request, view):
          if  request.user.is_staff == False and request.user.is_superuser == False:
             return True

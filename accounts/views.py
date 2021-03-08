@@ -24,6 +24,18 @@ class AccountView(APIView):
             status=status.HTTP_201_CREATED
         )
 
+    def delete(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        user.delete()
+        return Response(
+            {'status': 'Deletado com sucesso'},
+            status=status.HTTP_204_NO_CONTENT
+        )
+
 class LoginView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
@@ -36,10 +48,10 @@ class LoginView(APIView):
 
         user = authenticate(
             username=serializer.data['username'],
-            email=request.data['email'],
+            email=serializer.data['email'],
             password=request.data['password']
         )
-        
+        ipdb.set_trace()
         if user is not None:
             token = Token.objects.get_or_create(user=user)[0]
 
