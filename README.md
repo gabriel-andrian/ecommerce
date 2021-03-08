@@ -1,34 +1,173 @@
-# Todo
+# E-COMMERCE
 
-- Model: Categories
-  Fazer o post da categories junto com o Product View, usar o get_or_create()
-  ex:
-  band, created = Band.objects.get_or_create(
-  name=request.data['name'])
+O objetivo desse projeto é criar um backend para um e-commerce.
 
-          if not created:
-              return Response({'message': f'{band.name} already exists'},status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+## Instalação
 
-        * Se ele vir com o GET é pq já existe o produto, Pode tirar o unique KEY do name do produto
+```python
+pip install -r requirements
+```
 
-loop no categories:
-for tag in request.data['tags']:
-tag = Tag.objects.get_or_create(\*\*tag)[0]
-band.tags.add(tag)
+## Utilização
 
-Se já existe a categoria ele só vai pegar, se não vai criar. e add todas as categorias para o Product.
+Feito em formato de API com as seguintes rotas:
 
-# ORDER STATUS:
+### POST /api/accounts/ **- criando um administrador**
 
-fazer atualizar só o campo STATUS com as opções, se for o status CANCELADO precisa ter + 1 campo de mensagem, se não tiver retornar erro do campo faltando, os outros status podem ter mensagem == empty
+```javascript
+// REQUEST
+{
+	"username": "admin",
+        "email": "admin@mail.com",
+	"password": "1234",
+	"is_superuser": true,
+	"is_staff": true
+}
+```
 
-# Product
+**Resposta**
 
-Não deletar o item... Usar um state avaliable / not para saber se o item 'existe' ou não.
+```javascript
+// RESPONSE STATUS -> HTTP 201
+{
+  "id": 1,
+  "is_superuser": true,
+  "is_staff": true,
+  "username": "admin",
+  "email": "admin@mail.com"
+}
+```
 
-# Cart - Item
+### POST /api/login/ **- fazendo login do admin**
 
-Quando for deletar ou encerrar o carrinho, fazer um loop pelos itens e deletar 1 por 1 (item) e no fim, deletar o carrinho.
+```javascript
+// REQUEST
+{
+  "username": "admin",
+  "email": "admin@mail.com",
+  "password": "1234"
+}
+```
 
-Cart 1x1 usuario, quando o usuario fecha a compra abre uma ORDER e deleta o carrinho (Com isso vc
-tem o carrinho salvo no banco de dados, mas quando o pedido é finalizado ou deletado o carrinho apaga os itens dentro.)
+**Resposta**
+
+```javascript
+// REQUEST STATUS -> HTTP 200
+{
+  "token": "xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+}
+```
+
+### POST /api/product/ **- criando um novo produto**
+
+```javascript
+// REQUEST
+// Header -> Authorization: Token <token-do-seller>
+{
+	 "name": "Produto",
+   "description": "Descrição do produto",
+   "price": 9.99,
+	 "categories": [
+		 {
+			 "name": "Categoria do Produto",
+   		 "description": "Descrição da Categoria"
+		 }
+	 ]
+}
+```
+
+**Resposta**
+
+```javascript
+// RESPONSE STATUS -> HTTP 201
+{
+	 "id": 1,
+   "name": "Produto",
+   "description": "Descrição do produto",
+   "price": 9.99,
+	 "categories": [
+		 {
+			 "id": 1,
+       "name": "Categoria do Produto",
+   		 "description": "Descrição da Categoria"
+		 }
+	 ]
+}
+```
+
+### GET /api/product/ **- listando os produtos com estoque disponível**
+
+**Resposta**
+
+```javascript
+// RESPONSE STATUS -> HTTP 200
+{
+	 "id": 1,
+   "name": "Produto",
+   "description": "Descrição do produto",
+   "price": 9.99,
+	 "categories": [
+		 {
+			 "id": 1,
+       "name": "Categoria do Produto",
+   		 "description": "Descrição da Categoria"
+		 }
+	 ]
+}
+```
+
+### GET /api/product/<slug:slug>/ **- listando produto específico**
+
+**Resposta**
+
+```javascript
+// RESPONSE STATUS -> HTTP 201
+{
+	 "id": 1,
+   "name": "Produto",
+   "description": "Descrição do produto",
+   "price": 9.99,
+	 "categories": [
+		 {
+			 "id": 1,
+       "name": "Categoria do Produto",
+   		 "description": "Descrição da Categoria"
+		 }
+	 ]
+}
+```
+
+### GET /api/category/ **- listando categorias**
+
+**Resposta**
+
+```javascript
+// RESPONSE STATUS -> HTTP 201
+{
+  "id": 1,
+  "name": "Categoria do Produto",
+  "description": "Descrição da Categoria"
+}
+```
+
+### GET /api/category/<slug:slug>/ **- listando categoria específica**
+
+**Resposta**
+
+```javascript
+// RESPONSE STATUS -> HTTP 201
+{
+  "id": 1,
+  "name": "Categoria do Produto",
+  "description": "Descrição da Categoria"
+}
+```
+
+## 🛠️ Construído com
+
+- [Django](https://www.djangoproject.com/) - O framework web usado
+
+## ✒️ Autores
+
+- **Gabriel Andrian** - _Atividade efetuada_ - [Gabriel Andrian](https://gitlab.com/gabriel_andrian) - [Linkedin](https://linkedin.com/in/gabriel-andrian/)
+- **Paulo Santos** - _Atividade efetuada_ - [Paulo Santos](https://gitlab.com/PauloSantosIII)-[Linkedin](https://linkedin.com/in/paulosantosiii)

@@ -110,8 +110,6 @@ class TransactionView(APIView):
         if not serializer_transaction.is_valid():
             return Response(serializer_transaction.error_messages, status=status.HTTP_400_BAD_REQUEST)
 
-        # Talvez fazer um campo de sucess or Not sucess antes do if ou então só criar
-        # a transaction dentro dos if.
         transaction = Transaction.objects.create(
             product=product, amount=request.data['amount'], transaction_type=request.data['transaction_type'])
 
