@@ -9,12 +9,17 @@ from products.models import Product, Stock
 from cart.models import Cart
 from .models import Order, OrderItem
 from .models import Order
-from .serializers import OrderSerializer, OrderItemSerializer
+from .serializers import OrderSerializer, OrderItemSerializer, OrderStatus, OrderInfo
 
 import ipdb
 
 
 class OrderView(APIView):
+    def get(self, request):
+        order = get_object_or_404(Order, id=request.data['order_id'])
+        serializer = OrderSerializer(order)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
     def post(self, request):
         cart = get_object_or_404(Cart, user_id=request.data['user_id'])
         user = get_object_or_404(User, id=request.data['user_id'])
@@ -27,12 +32,37 @@ class OrderView(APIView):
         serializer = OrderItemSerializer(items_order, many=True)
 
         for product in cart.item_set.all():
-            cart.delete_item(product.item, product.quantity)
+            cart.delete_item(product.item, product.quantity, 1)
 
         cart.delete()
         return Response(data=serializer.data)
 
+    def put(self, request):
+        serializer = OrderStatus(data=request.data)
 
-# Fazer o path de mudar o state ( não considerar o delete aqui)
+        if not serializer.is_valid():
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Fazer o delete que é para mudar o state delete e voltar no stock os produtos
+        order = get_object_or_404(Order, id=request.data['order_id'])
+
+        if order.status == 4:
+            return Response(data={'msg': 'Order has already been canceled'}, status=status.HTTP_403_FORBIDDEN)
+
+        if request.data['status'] == 4:
+            items = order.items_order.all()
+
+            for item in items:
+                stock = get_object_or_404(Stock, product_id=item.product_id)
+                stock.amount += item.quantity
+                stock.save()
+
+            order.status = request.data['status']
+            order.save()
+
+            return Response(data={'msg': f'Order {order.id} canceled'}, status=status.HTTP_200_OK)
+
+        order.status = request.data['status']
+        order.save()
+
+        serializer = OrderSerializer(order)
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)

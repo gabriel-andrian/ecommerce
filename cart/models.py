@@ -52,7 +52,7 @@ class Cart(models.Model):
         added = True
         return item, added
 
-    def delete_item(self, product, quantity=1):
+    def delete_item(self, product, quantity=1, order=0):
         if Item.objects.filter(cart=self.id, item=product).exists():
 
             item = Item.objects.get(cart=self.id, item=product)
@@ -66,6 +66,9 @@ class Cart(models.Model):
 
             if item.quantity - quantity == 0:
                 item.delete()
+
+            if order == 1:
+                return True
 
             stock = product.product_stock.amount
             product.product_stock.amount = stock + quantity

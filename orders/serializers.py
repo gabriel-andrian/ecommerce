@@ -16,3 +16,15 @@ class OrderItemSerializer(serializers.Serializer):
     product = ProductSerializer()
     quantity = serializers.IntegerField()
     price = serializers.IntegerField()
+
+
+class OrderStatus(serializers.Serializer):
+    order_id = serializers.IntegerField()
+    status = serializers.ChoiceField(choices=ORDER_STATUS)
+
+
+class OrderInfo(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    user = UserResumeSerializer()
+    status = serializers.ChoiceField(choices=ORDER_STATUS)
+    items_order = OrderItemSerializer()
