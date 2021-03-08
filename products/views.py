@@ -7,10 +7,14 @@ from rest_framework import status
 from .models import Stock, Product, Transaction, Category
 from .serializers import StockSerializer, ProductSerializer, TransactionSerializer, CategoriesSerializer
 # Create your views here.
-import ipdb
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from accounts.permissions import IsSeller, IsCostumer
 
 
 class ProductView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, slug=None):
 
@@ -35,12 +39,14 @@ class ProductView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
+        if not request.user.is_staff:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
         serializer = ProductSerializer(data=request.data)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Se o nome for igual esta retornando error 500, trocar.
         product, created = Product.objects.get_or_create(
             name=request.data['name'],
             description=request.data['description'],
@@ -59,15 +65,11 @@ class ProductView(APIView):
         serializer = ProductSerializer(product)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    # Delete apagando tabela Transaction (não pode)
-    # def delete(self, request, slug):
-
-    #     product = Product.objects.get(id=1)
-    #     product.delete()
-    #     return Response(data="ok", status=status.HTTP_200_OK)
-
 
 class CategoriesView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, slug=None):
 
         if not slug:
@@ -92,6 +94,9 @@ class CategoriesView(APIView):
 
 
 class TransactionView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsSeller]
+
     def post(self, request):
         serializer = TransactionSerializer(data=request.data)
 
@@ -114,17 +119,10 @@ class TransactionView(APIView):
             if product.product_stock.amount - request.data['amount'] >= 0:
                 product.product_stock.amount -= request.data['amount']
                 product.product_stock.save()
-                return Response(data={'msg': 'Tirado com sucesso'})
-            return Response(data={'msg': 'Valor negativo no stock'})
+                return Response(data={'msg': 'Successfully Removed!'})
+            return Response(data={'msg': 'Value Out Of Range!'}, status=status.HTTP_400_BAD_REQUEST)
 
         elif transaction.transaction_type == 1:
             product.product_stock.amount += request.data['amount']
             product.product_stock.save()
-            return Response(data={'msg': 'Adicionado com sucesso'})
-
-
-class TesteView(APIView):
-    def get(self, request, slug):
-        category_slug = slug
-        ipdb.set_trace()
-        return Response(data={'msg': category_slug}, status=status.HTTP_200_OK)
+            return Response(data={'msg': 'Successfully Added!'})

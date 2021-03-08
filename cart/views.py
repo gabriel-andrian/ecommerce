@@ -10,22 +10,30 @@ from .serializers import CartSerializer, ItemSerializer, ItemQuantitySerializer
 from products.serializers import ProductSerializer
 
 from products.models import Product, Stock
-# /cart/item
-import ipdb
-
-# CartItemView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from accounts.permissions import IsSeller, IsCostumer
 
 
 class CartView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsCostumer]
+
     def get(self, request):
-        cart = get_object_or_404(Cart, user=request.data['user'])
+        user_id = request.user.id
+        cart = get_object_or_404(Cart, user=user_id)
 
         serializer = CartSerializer(cart)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class CartItemView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsCostumer]
+
     def post(self, request, slug):
+        user_id = request.user.id
+
         quantity = ItemQuantitySerializer(data=request.data)
 
         if not quantity.is_valid():
@@ -35,7 +43,7 @@ class CartItemView(APIView):
 
         productSerializer = ProductSerializer(product)
 
-        user = get_object_or_404(User, id=request.data['user_id'])
+        user = get_object_or_404(User, id=user_id)
 
         cart = Cart.objects.get_or_create(user=user)[0]
         item, added = cart.add_item(
@@ -55,6 +63,8 @@ class CartItemView(APIView):
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, slug):
+        user_id = request.user.id
+
         quantity = ItemQuantitySerializer(data=request.data)
 
         if not quantity.is_valid():
@@ -64,7 +74,7 @@ class CartItemView(APIView):
 
         productSerializer = ProductSerializer(product)
 
-        user = get_object_or_404(User, id=request.data['user_id'])
+        user = get_object_or_404(User, id=user_id)
 
         cart = get_object_or_404(Cart, user=user)
         removed = cart.delete_item(
@@ -80,5 +90,5 @@ class CartItemView(APIView):
         cart.total = total
 
         cart.save()
-        # serializer = ItemSerializer(item)
+
         return Response(status=status.HTTP_200_OK)
