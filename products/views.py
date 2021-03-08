@@ -14,7 +14,9 @@ import ipdb
 
 
 class ProductView(APIView):
+    
     def get(self, request, slug=None):
+
         if slug.lower() == 'avaliables':
             products = Product.objects.all()
             avaliables = []
