@@ -1,0 +1,32 @@
+version: "3.3"
+services:
+  db:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5431:5432
+    volumes:
+      - pgdata:/var/lib/postegresql/data
+
+  web:
+    build: .
+    # env_file: envs/dev.env
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000'
+
+    volumes:
+      - .:/ecommerce
+
+    stdin_open: true
+    tty: true
+    ports:
+      - 8000:8000
+
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
+    external: true

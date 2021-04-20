@@ -1,0 +1,12 @@
+.ipynb_checkpoints/*
+/notebooks/*
+/unused/*
+Dockerfile
+.DS_Store
+env.*
+/devops/*
+/venv
+
+# To prevent storing dev/temporary container data
+*.csv
+/tmp/*
