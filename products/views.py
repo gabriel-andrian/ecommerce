@@ -50,7 +50,8 @@ class ProductView(APIView):
         product, created = Product.objects.get_or_create(
             name=request.data['name'],
             description=request.data['description'],
-            price=request.data['price']
+            price=request.data['price'],
+            url=request.data['url']
         )
 
         if not created:

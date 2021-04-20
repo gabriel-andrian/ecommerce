@@ -13,6 +13,7 @@ class ProductSerializer(serializers.Serializer):
     name = serializers.CharField()
     description = serializers.CharField()
     price = serializers.FloatField()
+    url = serializers.CharField()
     created = serializers.DateField(read_only=True)
     modified = serializers.DateField(read_only=True)
     categories = CategoriesSerializer(many=True)
