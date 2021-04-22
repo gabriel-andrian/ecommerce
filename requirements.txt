@@ -27,3 +27,4 @@ traitlets==5.0.5
 wcwidth==0.2.5
 Werkzeug==1.0.1
 whitenoise==5.2.0
+django-heroku==0.3.1
